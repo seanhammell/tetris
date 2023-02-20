@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 
 #include "src/state.h"
+#include "src/texture.h"
 
 State state;
 
@@ -63,10 +64,13 @@ int main(int arg, char *argv[])
         return 0;
     }
 
+    Texture *tetriminoes = texture_create();
+
     SDL_Event event;
     for (;;) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
+                texture_destroy(tetriminoes);
                 cleanup();
                 return 0;
             }
