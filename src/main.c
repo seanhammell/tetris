@@ -59,12 +59,18 @@ void cleanup(void)
 int main(int arg, char *argv[])
 {
     if (initialize() != 0) {
-        printf("Failed to initialize\n");
+        fprintf(stderr, "Failed to initialize\n");
         cleanup();
         return 0;
     }
 
     Texture *tetriminoes = texture_create();
+    if (texture_initialize(tetriminoes, "./img/tetriminoes.png") != 0) {
+        fprintf(stderr, "Failed to initialize texture\n");
+        texture_destroy(tetriminoes);
+        cleanup();
+        return 0;
+    }
 
     SDL_Event event;
     for (;;) {
