@@ -3,6 +3,7 @@
 
 #include "src/state.h"
 #include "src/texture.h"
+#include "src/tetrimino.h"
 
 State state;
 
@@ -72,10 +73,13 @@ int main(int arg, char *argv[])
         return 0;
     }
 
+    Tetrimino *t = tetrimino_create();
+
     SDL_Event event;
     for (;;) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
+                tetrimino_destroy(t);
                 texture_destroy(tetriminoes);
                 cleanup();
                 return 0;
