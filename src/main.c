@@ -81,6 +81,11 @@ int main(int arg, char *argv[])
                 return 0;
             }
         }
+
+        SDL_SetRenderDrawColor(state.renderer, 0xff, 0xff, 0xff, 0xff);
+        SDL_RenderClear(state.renderer);
+        texture_render(tetriminoes);
+        SDL_RenderPresent(state.renderer);
     }
 
     return 0;

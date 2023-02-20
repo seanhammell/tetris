@@ -9,4 +9,6 @@ Texture *texture_create(void);
 int texture_initialize(Texture *self, const char *path);
 void texture_destroy(Texture *self);
 
+void texture_render(const Texture *self);
+
 #endif /* TEXTURE_H */

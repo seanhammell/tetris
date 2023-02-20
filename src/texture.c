@@ -16,6 +16,8 @@ typedef struct texture {
 } Texture;
 #endif /* TEXTURE_INTERNAL */
 
+#include "src/texture.h"
+
 /**
  * Resets the members of a Texture object, if applicable.
  */
@@ -65,7 +67,6 @@ int texture_initialize(Texture *self, const char *path)
     self->width = sprite_sheet->w;
     self->height = sprite_sheet->h;
 
-    SDL_DestroyTexture(temp);
     SDL_FreeSurface(sprite_sheet);
 
     for (int r = 0; r < 2; ++r) {
@@ -95,4 +96,11 @@ void texture_destroy(Texture *self)
     self = NULL;
 }
 
-#include "src/texture.h"
+/**
+ * Renders the Texture to the screen.
+ */
+void texture_render(const Texture *self)
+{
+    SDL_Rect dest = { 0, 0, self->width, self->height };
+    SDL_RenderCopy(state.renderer, self->texture, NULL, &dest);
+}
