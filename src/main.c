@@ -21,7 +21,7 @@ int initialize(void)
         fprintf(stderr, "Warning: linear texture filtering not enabled\n");
     }
 
-    state.window = SDL_CreateWindow("Connect 4", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 448, 384, SDL_WINDOW_SHOWN);
+    state.window = SDL_CreateWindow("Connect 4", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 640, SDL_WINDOW_SHOWN);
     if (state.window == NULL) {
         fprintf(stderr, "Error creating window: %s\n", SDL_GetError());
         return 1;
@@ -65,22 +65,23 @@ int main(int arg, char *argv[])
         return 0;
     }
 
-    Texture *tetriminoes = texture_create();
-    if (texture_initialize(tetriminoes, "./img/tetriminoes.png") != 0) {
+    Texture *blocks = texture_create();
+    if (texture_initialize(blocks, "./img/tetriminoes.png") != 0) {
         fprintf(stderr, "Failed to initialize texture\n");
-        texture_destroy(tetriminoes);
+        texture_destroy(blocks);
         cleanup();
         return 0;
     }
 
-    Tetrimino *t = tetrimino_create();
+    Tetrimino *s = tetrimino_create();
+    tetrimino_initialize(s, 7);
 
     SDL_Event event;
     for (;;) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
-                tetrimino_destroy(t);
-                texture_destroy(tetriminoes);
+                tetrimino_destroy(s);
+                texture_destroy(blocks);
                 cleanup();
                 return 0;
             }
@@ -88,7 +89,7 @@ int main(int arg, char *argv[])
 
         SDL_SetRenderDrawColor(state.renderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(state.renderer);
-        texture_render(tetriminoes);
+        tetrimino_render(s, blocks);
         SDL_RenderPresent(state.renderer);
     }
 

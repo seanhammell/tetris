@@ -72,10 +72,10 @@ int texture_initialize(Texture *self, const char *path)
     for (int r = 0; r < 2; ++r) {
         for (int c = 0; c < 4; ++c) {
             const int i = 4 * r + c;
-            self->clips[i].x = 16 * c;
-            self->clips[i].y = 16 * r;
-            self->clips[i].w = 16;
-            self->clips[i].h = 16;
+            self->clips[i].x = 32 * c;
+            self->clips[i].y = 32 * r;
+            self->clips[i].w = 32;
+            self->clips[i].h = 32;
         }
     }
 
@@ -99,8 +99,12 @@ void texture_destroy(Texture *self)
 /**
  * Renders the Texture to the screen.
  */
-void texture_render(const Texture *self)
+void texture_render(const Texture *self, const int block_type, const int x, const int y)
 {
-    SDL_Rect dest = { 0, 0, self->width, self->height };
-    SDL_RenderCopy(state.renderer, self->texture, NULL, &dest);
+    SDL_Rect dest = { x, y, self->width, self->height };
+    if (block_type != 0) {
+        dest.w = self->clips[block_type].w;
+        dest.h = self->clips[block_type].h;
+    }
+    SDL_RenderCopy(state.renderer, self->texture, &self->clips[block_type], &dest);
 }

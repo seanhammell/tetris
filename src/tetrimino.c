@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "src/texture.h"
+
 #ifndef TETRIMINO_INTERNAL
 #define TETRIMINO_INTERNAL
 enum blocks {
@@ -17,6 +19,8 @@ enum blocks {
 typedef struct tetrimino {
     enum blocks block_type;
     int current_rotation;
+    int x;
+    int y;
 } Tetrimino;
 #endif /* TETRIMINO_INTERNAL */
 
@@ -90,7 +94,14 @@ Tetrimino *tetrimino_create(void)
     Tetrimino *self = malloc(sizeof(Tetrimino));
     self->block_type = EMPTY;
     self->current_rotation = 0;
+    self->x = 160;
+    self->y = 0;
     return self;
+}
+
+void tetrimino_initialize(Tetrimino *self, int block_type)
+{
+    self->block_type = block_type;
 }
 
 /**
@@ -99,4 +110,23 @@ Tetrimino *tetrimino_create(void)
 void tetrimino_destroy(Tetrimino *self)
 {
     free(self);
+}
+
+/**
+ * Render the Tetrimino to the screen according to the bitmap of the current
+ * rotation.
+ */
+void tetrimino_render(Tetrimino *self, Texture *blocks)
+{
+    uint16_t bit = 1;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (tetrimino_rotations[self->block_type][self->current_rotation] & bit) {
+                const int x = self->x + j * 32;
+                const int y = self->y + 96 - i * 32;
+                texture_render(blocks, self->block_type, x, y);
+            }
+            bit <<= 1;
+        }
+    }
 }
