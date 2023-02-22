@@ -11,6 +11,7 @@ Tetrimino *tetrimino_create(void);
 void tetrimino_initialize(Tetrimino *self, int block_type);
 void tetrimino_destroy(Tetrimino *self);
 
+void tetrimino_set_position(Tetrimino *self, const int x, const int y);
 void tetrimino_rotate(Tetrimino *self);
 
 void tetrimino_render(Tetrimino *self, Texture *blocks);

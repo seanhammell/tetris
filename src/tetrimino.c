@@ -113,7 +113,16 @@ void tetrimino_destroy(Tetrimino *self)
 }
 
 /**
- * Increments the current rotation, looping back to 0 after 3.
+ * Sets the Tetrimino's position.
+ */
+void tetrimino_set_position(Tetrimino *self, const int x, const int y)
+{
+    self->x = x;
+    self->y = y;
+}
+
+/**
+ * Increments the Tetrimino's current rotation, looping back to 0 after 3.
  */
 void tetrimino_rotate(Tetrimino *self)
 {
