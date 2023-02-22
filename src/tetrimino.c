@@ -113,6 +113,15 @@ void tetrimino_destroy(Tetrimino *self)
 }
 
 /**
+ * Increments the current rotation, looping back to 0 after 3.
+ */
+void tetrimino_rotate(Tetrimino *self)
+{
+    ++self->current_rotation;
+    self->current_rotation &= 3;
+}
+
+/**
  * Render the Tetrimino to the screen according to the bitmap of the current
  * rotation.
  */

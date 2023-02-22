@@ -74,7 +74,7 @@ int main(int arg, char *argv[])
     }
 
     Tetrimino *s = tetrimino_create();
-    tetrimino_initialize(s, 7);
+    tetrimino_initialize(s, 2);
 
     SDL_Event event;
     for (;;) {
@@ -84,6 +84,14 @@ int main(int arg, char *argv[])
                 texture_destroy(blocks);
                 cleanup();
                 return 0;
+            }
+
+            if (event.type == SDL_KEYDOWN) {
+                switch (event.key.keysym.sym) {
+                case SDLK_UP:
+                    tetrimino_rotate(s);
+                    break;
+                }
             }
         }
 
