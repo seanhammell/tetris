@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
@@ -5,12 +7,18 @@
 #include "src/texture.h"
 #include "src/tetrimino.h"
 
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 576
+
 #define R 236
 #define G 239
 #define B 244
 #define A 255
 
 State state;
+
+static Texture *background;
+static Texture *blocks;
 
 /**
  * Initializes SDL and the global state.
@@ -26,7 +34,7 @@ int initialize(void)
         fprintf(stderr, "Warning: linear texture filtering not enabled\n");
     }
 
-    state.window = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 640, SDL_WINDOW_SHOWN);
+    state.window = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (state.window == NULL) {
         fprintf(stderr, "Error creating window: %s\n", SDL_GetError());
         return 1;
@@ -37,8 +45,8 @@ int initialize(void)
         fprintf(stderr, "Error creating renderer: %s\n", SDL_GetError());
         return 1;
     }
-
     SDL_SetRenderDrawColor(state.renderer, R, G, B, A);
+
     if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
         fprintf(stderr, "Error initializing SDL_image: %s\n", IMG_GetError());
         return 1;
@@ -52,6 +60,9 @@ int initialize(void)
  */
 void cleanup(void)
 {
+    texture_destroy(blocks);
+    texture_destroy(background);
+
     SDL_DestroyRenderer(state.renderer);
     SDL_DestroyWindow(state.window);
 
@@ -64,81 +75,44 @@ void cleanup(void)
 
 int main(int arg, char *argv[])
 {
+    background = texture_create();
+    blocks = texture_create();
+
     if (initialize() != 0) {
         fprintf(stderr, "Failed to initialize\n");
-        cleanup();
-        return 0;
+        goto terminate;
     }
 
-    Texture *blocks = texture_create();
+    if (texture_initialize(background, "./img/background.png") !=  0) {
+        fprintf(stderr, "Failed to initialize background texture\n");
+        goto terminate;
+    }
+
     if (texture_initialize(blocks, "./img/tetriminoes.png") != 0) {
-        fprintf(stderr, "Failed to initialize texture\n");
-        texture_destroy(blocks);
-        cleanup();
-        return 0;
+        fprintf(stderr, "Failed to initialize blocks texture\n");
+        goto terminate;
     }
 
-    Tetrimino *O = tetrimino_create();
-    tetrimino_initialize(O, 1);
-    tetrimino_set_position(O, 56, 56);
-
-    Tetrimino *I = tetrimino_create();
-    tetrimino_initialize(I, 2);
-    tetrimino_set_position(I, 256, 56);
-
-    Tetrimino *Z = tetrimino_create();
-    tetrimino_initialize(Z, 3);
-    tetrimino_set_position(Z, 456, 56);
-
-    Tetrimino *S = tetrimino_create();
-    tetrimino_initialize(S, 4);
-    tetrimino_set_position(S, 56, 256);
-
-    Tetrimino *T = tetrimino_create();
-    tetrimino_initialize(T, 5);
-    tetrimino_set_position(T, 256, 256);
-
-    Tetrimino *L = tetrimino_create();
-    tetrimino_initialize(L, 6);
-    tetrimino_set_position(L, 456, 256);
-
-    Tetrimino *J = tetrimino_create();
-    tetrimino_initialize(J, 7);
-    tetrimino_set_position(J, 256, 456);
-
-    Tetrimino *minoes[7] = {O, I, Z, S, T, L, J};
+    texture_set_clips(background, 1, 1, SCREEN_WIDTH, SCREEN_HEIGHT);
+    texture_set_clips(blocks, 2, 4, 32, 32);
 
     SDL_Event event;
     for (;;) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
-                for (int i = 0; i < 7; ++i) {
-                    tetrimino_destroy(minoes[i]);
-                }
-                texture_destroy(blocks);
-                cleanup();
-                return 0;
-            }
-
-            if (event.type == SDL_KEYDOWN) {
-                int i;
-                switch (event.key.keysym.sym) {
-                case SDLK_UP:
-                    for (i = 0; i < 7; ++i) {
-                        tetrimino_rotate(minoes[i]);
-                    }
-                    break;
-                }
+                goto terminate;
             }
         }
 
         SDL_SetRenderDrawColor(state.renderer, R, G, B, A);
         SDL_RenderClear(state.renderer);
-        for (int i = 0; i < 7; ++i) {
-            tetrimino_render(minoes[i], blocks);
-        }
+
+        texture_render(background, 0, 0, 0);
+        
         SDL_RenderPresent(state.renderer);
     }
 
+terminate:
+    cleanup();
     return 0;
 }

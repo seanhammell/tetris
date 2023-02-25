@@ -1,3 +1,4 @@
 tetris
 *.dSYM/
 *.gif
+.DS_Store

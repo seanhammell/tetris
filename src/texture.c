@@ -69,21 +69,28 @@ int texture_initialize(Texture *self, const char *path)
 
     SDL_FreeSurface(sprite_sheet);
 
-    for (int r = 0; r < 2; ++r) {
-        for (int c = 0; c < 4; ++c) {
-            const int i = 4 * r + c;
-            self->clips[i].x = 32 * c;
-            self->clips[i].y = 32 * r;
-            self->clips[i].w = 32;
-            self->clips[i].h = 32;
-        }
-    }
-
     if (self->texture == NULL) {
         return 1;
     }
 
     return 0;
+}
+
+/**
+ * Sets the clips for the Texture based on the number of rows and columns,
+ * and the width and height of the sprites.
+ */
+void texture_set_clips(Texture *self, const int n_rows, const int n_cols, const int width, const int height)
+{
+    for (int r = 0; r < n_rows; ++r) {
+        for (int c = 0; c < n_cols; ++c) {
+            const int i = n_cols * r + c;
+            self->clips[i].x = width * c;
+            self->clips[i].y = height * r;
+            self->clips[i].w = width;
+            self->clips[i].h = height;
+        }
+    }
 }
 
 /**
@@ -99,12 +106,12 @@ void texture_destroy(Texture *self)
 /**
  * Renders the Texture to the screen.
  */
-void texture_render(const Texture *self, const int block_type, const int x, const int y)
+void texture_render(const Texture *self, const int clip, const int x, const int y)
 {
     SDL_Rect dest = { x, y, self->width, self->height };
-    if (block_type != 0) {
-        dest.w = self->clips[block_type].w;
-        dest.h = self->clips[block_type].h;
+    if (clip != 0) {
+        dest.w = self->clips[clip].w;
+        dest.h = self->clips[clip].h;
     }
-    SDL_RenderCopy(state.renderer, self->texture, &self->clips[block_type], &dest);
+    SDL_RenderCopy(state.renderer, self->texture, &self->clips[clip], &dest);
 }
