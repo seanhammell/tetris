@@ -30,25 +30,6 @@ Tetris *tetris_create(void)
 }
 
 /**
- * Initializes the Tetris object with a random bag of blocks.
- */
-void tetris_initialize(Tetris *self)
-{
-    srand(time(NULL));
-    self->bag_index = 7;
-    self->next_block = rand() % 7 + 1;
-    tetris_pull_from_random_bag(self);
-}
-
-/**
- * Destroys the Tetris object.
- */
-void tetris_destroy(Tetris *self)
-{
-    free(self);
-}
-
-/**
  * Generates a new set of blocks for the random bag.
  */
 void generate_random_bag(Tetris *self)
@@ -64,6 +45,26 @@ void generate_random_bag(Tetris *self)
         } while (self->random_bag[i] != 0);
         self->random_bag[i] = block;
     }
+}
+
+/**
+ * Initializes the Tetris object with a random bag of blocks.
+ */
+void tetris_initialize(Tetris *self)
+{
+    srand(time(NULL));
+    generate_random_bag(self);
+    self->current_block = self->random_bag[0];
+    self->next_block = self->random_bag[1];
+    self->bag_index = 2;
+}
+
+/**
+ * Destroys the Tetris object.
+ */
+void tetris_destroy(Tetris *self)
+{
+    free(self);
 }
 
 /**
