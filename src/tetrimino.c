@@ -99,6 +99,9 @@ Tetrimino *tetrimino_create(void)
     return self;
 }
 
+/**
+ * Initializes the Tetrimino with the specified block type.
+ */
 void tetrimino_initialize(Tetrimino *self, int block_type)
 {
     self->block_type = block_type;

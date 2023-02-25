@@ -5,6 +5,7 @@
 
 #include "src/state.h"
 #include "src/texture.h"
+#include "src/tetris.h"
 #include "src/tetrimino.h"
 
 #define SCREEN_WIDTH 640
@@ -16,6 +17,8 @@
 #define A 255
 
 State state;
+
+static Tetris *game;
 
 static Texture *background;
 static Texture *blocks;
@@ -63,6 +66,8 @@ void cleanup(void)
     texture_destroy(blocks);
     texture_destroy(background);
 
+    tetris_destroy(game);
+
     SDL_DestroyRenderer(state.renderer);
     SDL_DestroyWindow(state.window);
 
@@ -75,6 +80,8 @@ void cleanup(void)
 
 int main(int arg, char *argv[])
 {
+    game = tetris_create();
+
     background = texture_create();
     blocks = texture_create();
 
