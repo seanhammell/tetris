@@ -23,7 +23,7 @@ Tetris *tetris_create(void)
     self->level = 1;
     self->lines = 0;
     srand(time(NULL));
-    self->bag_index = 0;
+    self->bag_index = 7;
     return self;
 }
 
@@ -33,4 +33,31 @@ Tetris *tetris_create(void)
 void tetris_destroy(Tetris *self)
 {
     free(self);
+}
+
+/**
+ * Returns the next block type in the random bag, generating the next bag if
+ * the current bag is empty.
+ */
+int tetris_pull_from_random_bag(Tetris *self)
+{
+    if (self->bag_index > 6) {
+        for (int i = 0; i < 7; ++i) {
+            self->random_bag[i] = 0;
+        }
+
+        for (int block = 1; block < 8; ++block) {
+            int i;
+            do {
+                i = rand() % 7;
+            } while (self->random_bag[i] != 0);
+            self->random_bag[i] = block;
+        }
+
+        self->bag_index = 0;
+    }
+
+    int block = self->random_bag[self->bag_index];
+    ++self->bag_index;
+    return block;
 }

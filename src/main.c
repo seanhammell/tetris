@@ -104,10 +104,19 @@ int main(int arg, char *argv[])
     texture_set_clips(blocks, 2, 4, 32, 32);
 
     SDL_Event event;
+    Tetrimino *t = tetrimino_create();
+    tetrimino_initialize(t, tetris_pull_from_random_bag(game));
+    tetrimino_set_position(t, 160, 0);
     for (;;) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 goto terminate;
+            }
+
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_UP) {
+                    tetrimino_initialize(t, tetris_pull_from_random_bag(game));
+                }
             }
         }
 
@@ -115,6 +124,7 @@ int main(int arg, char *argv[])
         SDL_RenderClear(state.renderer);
 
         texture_render(background, 0, 0, 0);
+        tetrimino_render(t, blocks);
         
         SDL_RenderPresent(state.renderer);
     }

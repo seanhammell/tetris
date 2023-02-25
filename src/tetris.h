@@ -8,4 +8,6 @@ typedef void Tetris;
 Tetris *tetris_create(void);
 void tetris_destroy(Tetris *self);
 
+int tetris_pull_from_random_bag(Tetris *self);
+
 #endif /* TETRIS_H */
