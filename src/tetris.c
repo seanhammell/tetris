@@ -10,8 +10,12 @@ typedef struct tetris {
 
     int random_bag[7];
     int bag_index;
+    int current_block;
+    int next_block;
 } Tetris;
 #endif /* TETRIS_INTERNAL */
+
+#include "src/tetris.h"
 
 /**
  * Creates a new Tetris object.
@@ -22,9 +26,18 @@ Tetris *tetris_create(void)
     self->score = 0;
     self->level = 1;
     self->lines = 0;
+    return self;
+}
+
+/**
+ * Initializes the Tetris object with a random bag of blocks.
+ */
+void tetris_initialize(Tetris *self)
+{
     srand(time(NULL));
     self->bag_index = 7;
-    return self;
+    self->next_block = rand() % 7 + 1;
+    tetris_pull_from_random_bag(self);
 }
 
 /**
@@ -36,28 +49,52 @@ void tetris_destroy(Tetris *self)
 }
 
 /**
- * Returns the next block type in the random bag, generating the next bag if
- * the current bag is empty.
+ * Generates a new set of blocks for the random bag.
  */
-int tetris_pull_from_random_bag(Tetris *self)
+void generate_random_bag(Tetris *self)
 {
+    for (int i = 0; i < 7; ++i) {
+        self->random_bag[i] = 0;
+    }
+
+    for (int block = 1; block < 8; ++block) {
+        int i;
+        do {
+            i = rand() % 7;
+        } while (self->random_bag[i] != 0);
+        self->random_bag[i] = block;
+    }
+}
+
+/**
+ * Sets the block on deck to the current block and pulls the next block from
+ * the random bag.
+ */
+void tetris_pull_from_random_bag(Tetris *self)
+{
+    self->current_block = self->next_block;
+
     if (self->bag_index > 6) {
-        for (int i = 0; i < 7; ++i) {
-            self->random_bag[i] = 0;
-        }
-
-        for (int block = 1; block < 8; ++block) {
-            int i;
-            do {
-                i = rand() % 7;
-            } while (self->random_bag[i] != 0);
-            self->random_bag[i] = block;
-        }
-
+        generate_random_bag(self);
         self->bag_index = 0;
     }
 
-    int block = self->random_bag[self->bag_index];
+    self->next_block  = self->random_bag[self->bag_index];
     ++self->bag_index;
-    return block;
+}
+
+/**
+ * Returns the current block.
+ */
+int tetris_get_current_block(Tetris *self)
+{
+    return self->current_block;
+}
+
+/**
+ * Returns the next block.
+ */
+int tetris_get_next_block(Tetris *self)
+{
+    return self->next_block;
 }
