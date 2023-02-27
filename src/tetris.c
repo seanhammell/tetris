@@ -2,6 +2,7 @@
 #include <time.h>
 
 #include "src/texture.h"
+#include "src/tetrimino.h"
 
 #ifndef TETRIS_INTERNAL
 #define TETRIS_INTERNAL
@@ -11,10 +12,10 @@ typedef struct tetris {
     int lines;
     int matrix[200];
 
+    Tetrimino *current;
+    Tetrimino *next;
     int random_bag[7];
     int bag_index;
-    int current_block;
-    int next_block;
 } Tetris;
 #endif /* TETRIS_INTERNAL */
 
@@ -32,6 +33,8 @@ Tetris *tetris_create(void)
     for (int i = 0; i < 200; ++i) {
         self->matrix[i] = 0;
     }
+    self->current = tetrimino_create();
+    self->next = tetrimino_create();
     return self;
 }
 
@@ -60,8 +63,8 @@ void tetris_initialize(Tetris *self)
 {
     srand(time(NULL));
     generate_random_bag(self);
-    self->current_block = self->random_bag[0];
-    self->next_block = self->random_bag[1];
+    tetrimino_set_block_type(self->current, self->random_bag[0]);
+    tetrimino_set_block_type(self->next, self->random_bag[1]);
     self->bag_index = 2;
 }
 
@@ -70,6 +73,8 @@ void tetris_initialize(Tetris *self)
  */
 void tetris_destroy(Tetris *self)
 {
+    tetrimino_destroy(self->current);
+    tetrimino_destroy(self->next);
     free(self);
     self = NULL;
 }
