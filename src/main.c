@@ -6,7 +6,6 @@
 #include "src/state.h"
 #include "src/texture.h"
 #include "src/tetris.h"
-#include "src/tetrimino.h"
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 576
@@ -17,8 +16,6 @@
 #define A 255
 
 State state;
-
-static Tetris *game;
 
 static Texture *background;
 static Texture *blocks;
@@ -66,8 +63,6 @@ void cleanup(void)
     texture_destroy(blocks);
     texture_destroy(background);
 
-    tetris_destroy(game);
-
     SDL_DestroyRenderer(state.renderer);
     SDL_DestroyWindow(state.window);
 
@@ -80,9 +75,6 @@ void cleanup(void)
 
 int main(int arg, char *argv[])
 {
-    game = tetris_create();
-    tetris_initialize(game);
-
     background = texture_create();
     blocks = texture_create();
 
@@ -105,27 +97,10 @@ int main(int arg, char *argv[])
     texture_set_clips(blocks, 2, 4, 32, 32);
 
     SDL_Event event;
-    Tetrimino *current = tetrimino_create();
-    Tetrimino *next = tetrimino_create();
-
-    tetrimino_initialize(current, tetris_get_current_block(game));
-    tetrimino_initialize(next, tetris_get_next_block(game));
-    tetrimino_set_position(current, 160, 0);
-    tetrimino_set_position(next, 480, 416);
-
     for (;;) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 goto terminate;
-            }
-
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_UP) {
-                    tetris_pull_from_random_bag(game);
-                    tetrimino_initialize(current, tetris_get_current_block(game));
-                    tetrimino_initialize(next, tetris_get_next_block(game));
-                    tetrimino_set_position(current, 160, 0);
-                }
             }
         }
 
@@ -133,8 +108,6 @@ int main(int arg, char *argv[])
         SDL_RenderClear(state.renderer);
 
         texture_render(background, 0, 0, 0);
-        tetrimino_render(current, blocks);
-        tetrimino_render(next, blocks);
 
         SDL_RenderPresent(state.renderer);
     }

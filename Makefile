@@ -1,5 +1,5 @@
 CC = clang
-OBJ = src/main.c src/texture.c src/tetris.c src/tetrimino.c
+OBJ = src/main.c src/texture.c src/tetris.c
 FLAGS = -g -Werror
 INC = -I .
 LIBS = -l SDL2 -l SDL2_image
