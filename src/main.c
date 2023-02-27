@@ -96,10 +96,12 @@ int main(int arg, char *argv[])
     texture_set_clips(background, 1, 1, SCREEN_WIDTH, SCREEN_HEIGHT);
     texture_set_clips(blocks, 2, 4, 32, 32);
 
+    Tetris *tetris = tetris_create();
     SDL_Event event;
     for (;;) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
+                tetris_destroy(tetris);
                 goto terminate;
             }
         }
