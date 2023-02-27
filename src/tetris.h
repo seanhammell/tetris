@@ -6,6 +6,7 @@ typedef void Tetris;
 #endif /* TETRIS_INTERNAL */
 
 Tetris *tetris_create(void);
+void tetris_initialize(Tetris *self);
 void tetris_destroy(Tetris *self);
 
 void tetris_render_matrix(Tetris *self, Texture *blocks);

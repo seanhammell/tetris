@@ -97,6 +97,8 @@ int main(int arg, char *argv[])
     texture_set_clips(blocks, 2, 4, 32, 32);
 
     Tetris *tetris = tetris_create();
+    tetris_initialize(tetris);
+
     SDL_Event event;
     for (;;) {
         while (SDL_PollEvent(&event)) {

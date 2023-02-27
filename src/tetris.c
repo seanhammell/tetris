@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <time.h>
 
 #include "src/texture.h"
 
@@ -9,6 +10,11 @@ typedef struct tetris {
     int level;
     int lines;
     int matrix[200];
+
+    int random_bag[7];
+    int bag_index;
+    int current_block;
+    int next_block;
 } Tetris;
 #endif /* TETRIS_INTERNAL */
 
@@ -27,6 +33,36 @@ Tetris *tetris_create(void)
         self->matrix[i] = 0;
     }
     return self;
+}
+
+/**
+ * Generates a new set of blocks for the random bag.
+ */
+void generate_random_bag(Tetris *self)
+{
+    for (int i = 0; i < 7; ++i) {
+        self->random_bag[i] = 0;
+    }
+
+    for (int block = 1; block < 8; ++block) {
+        int i;
+        do {
+            i = rand() % 7;
+        } while (self->random_bag[i] != 0);
+        self->random_bag[i] = block;
+    }
+}
+
+/**
+ * Initializes the Tetris object with a random bag of blocks.
+ */
+void tetris_initialize(Tetris *self)
+{
+    srand(time(NULL));
+    generate_random_bag(self);
+    self->current_block = self->random_bag[0];
+    self->next_block = self->random_bag[1];
+    self->bag_index = 2;
 }
 
 /**
@@ -56,6 +92,9 @@ void tetris_render_matrix(Tetris *self, Texture *blocks)
 {
     for (int i = 0; i < 20; ++i) {
         for (int j = 0; j < 10; ++j) {
+            if (self->matrix[10 * i + j] == 0) {
+                continue;
+            }
             texture_render(blocks, self->matrix[10 * i + j], 64 + 32 * j, 32 * i);
         }
     }
