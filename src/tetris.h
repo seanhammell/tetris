@@ -8,4 +8,6 @@ typedef void Tetris;
 Tetris *tetris_create(void);
 void tetris_destroy(Tetris *self);
 
+void tetris_render_matrix(Tetris *self, Texture *blocks);
+
 #endif /* TETRIS_H */
