@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <SDL2/SDL.h>
+
 #include "src/state.h"
 #include "src/texture.h"
 #include "src/tetrimino.h"
@@ -13,6 +15,7 @@ typedef struct tetris {
     int level;
     int lines;
     int matrix[20][10];
+    SDL_Rect matrix_bounds[3];
 
     Tetrimino *current;
     Tetrimino *next;
@@ -22,6 +25,12 @@ typedef struct tetris {
 #endif /* TETRIS_INTERNAL */
 
 #include "src/tetris.h"
+
+enum bounds {
+    GROUND,
+    LEFT_WALL,
+    RIGHT_WALL,
+};
 
 static int frames_per_step[30] = {
     48, 43, 38, 33, 28, 23, 18, 13, 8, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
@@ -34,13 +43,17 @@ Tetris *tetris_create(void)
 {
     Tetris *self = malloc(sizeof(Tetris));
     self->score = 0;
-    self->level = 0;
+    self->level = 10;
     self->lines = 0;
     for (int i = 0; i < 20; ++i) {
         for (int j = 0; j < 10; ++j) {
             self->matrix[i][j] = 0;
         }
     }
+    self->matrix_bounds[GROUND].x = 64;
+    self->matrix_bounds[GROUND].y = 576;
+    self->matrix_bounds[GROUND].w = 320;
+    self->matrix_bounds[GROUND].h = 0;
     self->current = tetrimino_create();
     self->next = tetrimino_create();
     return self;
@@ -122,6 +135,13 @@ void tetris_apply_gravity(Tetris *self)
     if (state.frames_since_step > frames_per_step[self->level]) {
         tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) + 32);
         state.frames_since_step = 0;
+
+        if (tetrimino_check_collision(self->current, self->matrix_bounds[GROUND])) {
+            tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) - 32);
+            add_current_tetrimino_to_matrix(self);
+            tetrimino_set_x_pos(self->current, 160);
+            tetrimino_set_y_pos(self->current, 0);
+        }
     }
 }
 

@@ -100,6 +100,7 @@ int main(int arg, char *argv[])
     tetris_initialize(tetris);
 
     SDL_Event event;
+    state.frames_since_step = 0;
     for (;;) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
