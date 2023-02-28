@@ -108,6 +108,8 @@ int main(int arg, char *argv[])
             }
         }
 
+        tetris_apply_gravity(tetris);
+
         SDL_SetRenderDrawColor(state.renderer, R, G, B, A);
         SDL_RenderClear(state.renderer);
 
@@ -115,6 +117,7 @@ int main(int arg, char *argv[])
         tetris_render(tetris, blocks);
 
         SDL_RenderPresent(state.renderer);
+        ++state.frames_since_step;
     }
 
 terminate:

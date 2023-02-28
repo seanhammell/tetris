@@ -1,14 +1,12 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include <stdint.h>
-
 #include <SDL2/SDL.h>
 
 typedef struct state {
     SDL_Window *window;
     SDL_Renderer *renderer;
-    uint32_t ticks;
+    int frames_since_step;
 } State;
 
 extern State state;

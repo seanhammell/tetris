@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "src/state.h"
 #include "src/texture.h"
 #include "src/tetrimino.h"
 
@@ -22,6 +23,10 @@ typedef struct tetris {
 
 #include "src/tetris.h"
 
+static int frames_per_step[30] = {
+    48, 43, 38, 33, 28, 23, 18, 13, 8, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+};
+
 /**
  * Creates a new Tetris object.
  */
@@ -29,7 +34,7 @@ Tetris *tetris_create(void)
 {
     Tetris *self = malloc(sizeof(Tetris));
     self->score = 0;
-    self->level = 1;
+    self->level = 0;
     self->lines = 0;
     for (int i = 0; i < 20; ++i) {
         for (int j = 0; j < 10; ++j) {
@@ -70,8 +75,9 @@ void tetris_initialize(Tetris *self)
     tetrimino_set_block_type(self->current, self->random_bag[0]);
     tetrimino_set_block_type(self->next, self->random_bag[1]);
 
-    tetrimino_set_position(self->current, 160, 0);
-    tetrimino_set_position(self->next, 480, 416);
+    tetrimino_set_x_pos(self->current, 160);
+    tetrimino_set_x_pos(self->next, 480);
+    tetrimino_set_y_pos(self->next, 416);
 
     self->bag_index = 2;
 }
@@ -104,6 +110,18 @@ void add_current_tetrimino_to_matrix(Tetris *self)
             bit <<= j < 3 ? 1 : 0;
         }
         bit >>= 7;
+    }
+}
+
+/**
+ * Apply gravity to the current Tetrimino based on the drop rate of the
+ * current level.
+ */
+void tetris_apply_gravity(Tetris *self)
+{
+    if (state.frames_since_step > frames_per_step[self->level]) {
+        tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) + 32);
+        state.frames_since_step = 0;
     }
 }
 

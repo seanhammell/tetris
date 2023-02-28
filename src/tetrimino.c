@@ -152,11 +152,22 @@ void tetrimino_set_block_type(Tetrimino *self, const int block_type)
     self->block_type = block_type;
 }
 
-void tetrimino_set_position(Tetrimino *self, const int x, const int y)
+/**
+ * Sets the x position of the Tetrimino.
+ */
+void tetrimino_set_x_pos(Tetrimino *self, const int x)
 {
     self->x = x;
+}
+
+/**
+ * Sets the y position of the Tetrimino.
+ */
+void tetrimino_set_y_pos(Tetrimino *self, const int y)
+{
     self->y = y;
 }
+
 
 /**
  * Renders the Tetrimino to the screen.
