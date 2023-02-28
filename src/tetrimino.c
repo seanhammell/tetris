@@ -107,9 +107,47 @@ void tetrimino_destroy(Tetrimino *self)
 }
 
 /**
+ * Returns the block type of the Tetrimino.
+ */
+int tetrimino_get_block_type(const Tetrimino *self)
+{
+    return self->block_type;
+}
+
+/**
+ * Returns the current rotation of the Tetrimino.
+ */
+uint16_t tetrimino_get_rotation(const Tetrimino *self)
+{
+    return tetrimino_rotations[self->block_type][self->current_rotation];
+}
+
+/**
+ * Returns the x position of the Tetrimino.
+ */
+int tetrimino_get_x_pos(const Tetrimino *self)
+{
+    return self->x;
+}
+
+/**
+ * Returns the y position of the Tetrimino.
+ */
+int tetrimino_get_y_pos(const Tetrimino *self)
+{
+    return self->y;
+}
+
+/**
  * Sets the block type of the Tetrimino.
  */
-void tetrimino_set_block_type(Tetrimino *self, int block_type)
+void tetrimino_set_block_type(Tetrimino *self, const int block_type)
 {
     self->block_type = block_type;
+}
+
+void tetrimino_set_position(Tetrimino *self, const int x, const int y)
+{
+    self->x = x;
+    self->y = y;
 }

@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -10,7 +11,7 @@ typedef struct tetris {
     int score;
     int level;
     int lines;
-    int matrix[200];
+    int matrix[20][10];
 
     Tetrimino *current;
     Tetrimino *next;
@@ -30,8 +31,10 @@ Tetris *tetris_create(void)
     self->score = 0;
     self->level = 1;
     self->lines = 0;
-    for (int i = 0; i < 200; ++i) {
-        self->matrix[i] = 0;
+    for (int i = 0; i < 20; ++i) {
+        for (int j = 0; j < 10; ++j) {
+            self->matrix[i][j] = 0;
+        }
     }
     self->current = tetrimino_create();
     self->next = tetrimino_create();
@@ -63,8 +66,13 @@ void tetris_initialize(Tetris *self)
 {
     srand(time(NULL));
     generate_random_bag(self);
+
     tetrimino_set_block_type(self->current, self->random_bag[0]);
     tetrimino_set_block_type(self->next, self->random_bag[1]);
+
+    tetrimino_set_position(self->current, 160, 0);
+    tetrimino_set_position(self->next, 480, 416);
+
     self->bag_index = 2;
 }
 
@@ -80,27 +88,38 @@ void tetris_destroy(Tetris *self)
 }
 
 /**
- * Renders the matrix to the screen.
- * 
- * The matrix represents the playfield of 20 rows and 10 columns. The layout is
- * as follows:
- * 
- *        0   1  2    3   4   5   6   7   8   9
- *       10  11  12  13  14  15  16  17  18  19
- *      ...
- *      190 191 192 193 194 195 196 197 198 199
- * 
- * This layout aligns with the coordinate system used in SDL where (0, 0) is
- * the top-left corner.
+ * Adds the current Tetrimino to the matrix. This makes it so we can render
+ * the Tetrimino with the rest of the matrix.
+ */
+void add_current_tetrimino_to_matrix(Tetris *self)
+{
+    uint16_t mino_bits = tetrimino_get_rotation(self->current);
+    uint16_t bit = 0x1000;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (mino_bits & bit) {
+                int row = i + tetrimino_get_y_pos(self->current) / 32;
+                int col = j + (tetrimino_get_x_pos(self->current) - 64) / 32;
+                self->matrix[row][col] = tetrimino_get_block_type(self->current);
+            }
+            bit <<= j < 3 ? 1 : 0;
+        }
+        bit >>= 7;
+    }
+}
+
+/**
+ * Renders the playfield matrix of 20 rows and 10 columns to the screen.
  */
 void tetris_render_matrix(Tetris *self, Texture *blocks)
 {
+    add_current_tetrimino_to_matrix(self);
     for (int i = 0; i < 20; ++i) {
         for (int j = 0; j < 10; ++j) {
-            if (self->matrix[10 * i + j] == 0) {
+            if (self->matrix[i][j] == 0) {
                 continue;
             }
-            texture_render(blocks, self->matrix[10 * i + j], 64 + 32 * j, 32 * i);
+            texture_render(blocks, self->matrix[i][j], 64 + 32 * j, 32 * i);
         }
     }
 }
