@@ -9,6 +9,6 @@ Tetris *tetris_create(void);
 void tetris_initialize(Tetris *self);
 void tetris_destroy(Tetris *self);
 
-void tetris_render_matrix(Tetris *self, Texture *blocks);
+void tetris_render(const Tetris *self, const Texture *blocks);
 
 #endif /* TETRIS_H */

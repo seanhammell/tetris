@@ -88,8 +88,7 @@ void tetris_destroy(Tetris *self)
 }
 
 /**
- * Adds the current Tetrimino to the matrix. This makes it so we can render
- * the Tetrimino with the rest of the matrix.
+ * Adds the current Tetrimino to the matrix.
  */
 void add_current_tetrimino_to_matrix(Tetris *self)
 {
@@ -109,11 +108,14 @@ void add_current_tetrimino_to_matrix(Tetris *self)
 }
 
 /**
- * Renders the playfield matrix of 20 rows and 10 columns to the screen.
+ * Renders the current Tetrimino, next Tetrimino, and playfield matrix to the
+ * screen.
  */
-void tetris_render_matrix(Tetris *self, Texture *blocks)
+void tetris_render(const Tetris *self, const Texture *blocks)
 {
-    add_current_tetrimino_to_matrix(self);
+    tetrimino_render(self->current, blocks);
+    tetrimino_render(self->next, blocks);
+
     for (int i = 0; i < 20; ++i) {
         for (int j = 0; j < 10; ++j) {
             if (self->matrix[i][j] == 0) {

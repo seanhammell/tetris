@@ -112,7 +112,7 @@ int main(int arg, char *argv[])
         SDL_RenderClear(state.renderer);
 
         texture_render(background, 0, 0, 0);
-        tetris_render_matrix(tetris, blocks);
+        tetris_render(tetris, blocks);
 
         SDL_RenderPresent(state.renderer);
     }

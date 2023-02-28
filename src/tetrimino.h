@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "src/texture.h"
+
 #ifndef TETRIMINO_INTERNAL
 typedef void Tetrimino;
 #endif /* TETRIMINO_INTERNAL */
@@ -17,5 +19,7 @@ int tetrimino_get_y_pos(const Tetrimino *self);
 
 void tetrimino_set_block_type(Tetrimino *self, const int block_type);
 void tetrimino_set_position(Tetrimino *self, const int x, const int y);
+
+void tetrimino_render(const Tetrimino *self, const Texture *blocks);
 
 #endif /* TETRIMINO_H */

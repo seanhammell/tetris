@@ -1,6 +1,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <SDL2/SDL.h>
+
+#include "src/texture.h"
+
 #ifndef TETRIMINO_INTERNAL
 #define TETRIMINO_INTERNAL
 enum blocks {
@@ -21,6 +25,8 @@ typedef struct tetrimino {
     int y;
 } Tetrimino;
 #endif /* TETRIMINO_INTERNAL */
+
+#include "src/tetrimino.h"
 
 static const uint16_t empty_rotations[4];
 
@@ -150,4 +156,22 @@ void tetrimino_set_position(Tetrimino *self, const int x, const int y)
 {
     self->x = x;
     self->y = y;
+}
+
+/**
+ * Renders the Tetrimino to the screen.
+ */
+void tetrimino_render(const Tetrimino *self, const Texture *blocks)
+{
+    uint16_t mino_bits = tetrimino_rotations[self->block_type][self->current_rotation];
+    uint16_t bit = 0x1000;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (mino_bits & bit) {
+                texture_render(blocks, self->block_type, self->x + 32 * j, self->y + 32 * i);
+            }
+            bit <<= j < 3 ? 1 : 0;
+        }
+        bit >>= 7;
+    }
 }
