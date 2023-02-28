@@ -43,7 +43,7 @@ Tetris *tetris_create(void)
 {
     Tetris *self = malloc(sizeof(Tetris));
     self->score = 0;
-    self->level = 10;
+    self->level = 0;
     self->lines = 0;
     for (int i = 0; i < 20; ++i) {
         for (int j = 0; j < 10; ++j) {
@@ -78,6 +78,20 @@ void generate_random_bag(Tetris *self)
 }
 
 /**
+ * Pulls the next block type from the random bag.
+ */
+void pull_from_random_bag(Tetris *self)
+{
+    tetrimino_set_block_type(self->current, tetrimino_get_block_type(self->next));
+    if (self->bag_index > 6) {
+        generate_random_bag(self);
+        self->bag_index = 0;
+    }
+    tetrimino_set_block_type(self->next, self->random_bag[self->bag_index]);
+    ++self->bag_index;
+}
+
+/**
  * Initializes the Tetris object with a random bag of blocks.
  */
 void tetris_initialize(Tetris *self)
@@ -85,14 +99,13 @@ void tetris_initialize(Tetris *self)
     srand(time(NULL));
     generate_random_bag(self);
 
-    tetrimino_set_block_type(self->current, self->random_bag[0]);
-    tetrimino_set_block_type(self->next, self->random_bag[1]);
+    tetrimino_set_block_type(self->next, self->random_bag[0]);
+    self->bag_index = 1;
+    pull_from_random_bag(self);
 
     tetrimino_set_x_pos(self->current, 160);
     tetrimino_set_x_pos(self->next, 480);
     tetrimino_set_y_pos(self->next, 416);
-
-    self->bag_index = 2;
 }
 
 /**
@@ -163,6 +176,7 @@ void tetris_apply_gravity(Tetris *self)
         if (tetrimino_check_collision(self->current, self->matrix_bounds[GROUND]) || current_tetrimino_matrix_collision(self)) {
             tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) - 32);
             add_current_tetrimino_to_matrix(self);
+            pull_from_random_bag(self);
             tetrimino_set_x_pos(self->current, 160);
             tetrimino_set_y_pos(self->current, 0);
         }
