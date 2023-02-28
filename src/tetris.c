@@ -107,6 +107,30 @@ void tetris_destroy(Tetris *self)
 }
 
 /**
+ * Tests whether the current Tetrimino is colliding with blocks in the matrix.
+ */
+int current_tetrimino_matrix_collision(Tetris *self)
+{
+    uint16_t mino_bits = tetrimino_get_rotation(self->current);
+    uint16_t bit = 0x1000;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (mino_bits & bit) {
+                int row = i + tetrimino_get_y_pos(self->current) / 32;
+                int col = j + (tetrimino_get_x_pos(self->current) - 64) / 32;
+                if (self->matrix[row][col] != 0) {
+                    return 1;
+                }
+            }
+            bit <<= j < 3 ? 1 : 0;
+        }
+        bit >>= 7;
+    }
+
+    return 0;
+}
+
+/**
  * Adds the current Tetrimino to the matrix.
  */
 void add_current_tetrimino_to_matrix(Tetris *self)
@@ -136,7 +160,7 @@ void tetris_apply_gravity(Tetris *self)
         tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) + 32);
         state.frames_since_step = 0;
 
-        if (tetrimino_check_collision(self->current, self->matrix_bounds[GROUND])) {
+        if (tetrimino_check_collision(self->current, self->matrix_bounds[GROUND]) || current_tetrimino_matrix_collision(self)) {
             tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) - 32);
             add_current_tetrimino_to_matrix(self);
             tetrimino_set_x_pos(self->current, 160);
