@@ -151,6 +151,15 @@ void tetrimino_set_block_type(Tetrimino *self, const int block_type)
 }
 
 /**
+ * Increments the current rotation of the Tetrimino.
+ */
+void tetrimino_rotate(Tetrimino *self)
+{
+    ++self->current_rotation;
+    self->current_rotation &= 3;
+}
+
+/**
  * Sets the x position of the Tetrimino.
  */
 void tetrimino_set_x_pos(Tetrimino *self, const int x)

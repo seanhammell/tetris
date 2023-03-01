@@ -12,6 +12,7 @@ void tetris_initialize(Tetris *self);
 void tetris_destroy(Tetris *self);
 
 void tetris_apply_gravity(Tetris *self);
+void tetris_handle_event(Tetris *self, const SDL_Event event);
 
 void tetris_render(const Tetris *self, const Texture *blocks);
 

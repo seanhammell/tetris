@@ -20,6 +20,8 @@ typedef struct tetris {
     Tetrimino *next;
     int random_bag[7];
     int bag_index;
+
+    int das_status;
 } Tetris;
 #endif /* TETRIS_INTERNAL */
 
@@ -29,6 +31,10 @@ static int frames_per_step[30] = {
     48, 43, 38, 33, 28, 23, 18, 13, 8, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
 };
 
+static int delayed_auto_shift[3] = {
+    0, 23, 9,
+};
+
 /**
  * Creates a new Tetris object.
  */
@@ -36,7 +42,7 @@ Tetris *tetris_create(void)
 {
     Tetris *self = malloc(sizeof(Tetris));
     self->score = 0;
-    self->level = 10;
+    self->level = 0;
     self->lines = 0;
     for (int i = 0; i < 19; ++i) {
         for (int j = 0; j < 10; ++j) {
@@ -49,6 +55,7 @@ Tetris *tetris_create(void)
     }
     self->current = tetrimino_create();
     self->next = tetrimino_create();
+    self->das_status = 0;
     return self;
 }
 
@@ -173,6 +180,40 @@ void tetris_apply_gravity(Tetris *self)
             tetrimino_set_x_pos(self->current, 160);
             tetrimino_set_y_pos(self->current, 0);
         }
+    }
+}
+
+/**
+ * Controls the current Tetrimino based on input events.
+ */
+void tetris_handle_event(Tetris *self, const SDL_Event event)
+{
+    if (event.type == SDL_KEYDOWN) {
+        switch (event.key.keysym.sym) {
+        case SDLK_UP:
+            tetrimino_rotate(self->current);
+            break;
+        case SDLK_LEFT:
+            if (state.delayed_auto_shift_frames > delayed_auto_shift[self->das_status]) {
+                tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) - 32);
+                state.delayed_auto_shift_frames = 0;
+                if (self->das_status < 2) {
+                    ++self->das_status;
+                }
+            }
+            break;
+        case SDLK_RIGHT:
+            if (state.delayed_auto_shift_frames > delayed_auto_shift[self->das_status]) {
+                tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) + 32);
+                state.delayed_auto_shift_frames = 0;
+                if (self->das_status < 2) {
+                    ++self->das_status;
+                }
+            }
+            break;
+        }
+    } else if (event.type == SDL_KEYUP) {
+        self->das_status = 0;
     }
 }
 

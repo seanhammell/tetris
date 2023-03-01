@@ -101,14 +101,16 @@ int main(int arg, char *argv[])
 
     SDL_Event event;
     state.frames_since_step = 0;
+    state.delayed_auto_shift_frames = 0;
     for (;;) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 tetris_destroy(tetris);
                 goto terminate;
             }
-        }
 
+            tetris_handle_event(tetris, event);
+        }
         tetris_apply_gravity(tetris);
 
         SDL_SetRenderDrawColor(state.renderer, R, G, B, A);
@@ -119,6 +121,7 @@ int main(int arg, char *argv[])
 
         SDL_RenderPresent(state.renderer);
         ++state.frames_since_step;
+        ++state.delayed_auto_shift_frames;
     }
 
 terminate:
