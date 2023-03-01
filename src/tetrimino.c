@@ -1,8 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <SDL2/SDL.h>
-
 #include "src/texture.h"
 
 #ifndef TETRIMINO_INTERNAL
@@ -12,7 +10,6 @@ typedef struct tetrimino {
     int current_rotation;
     int x;
     int y;
-    SDL_Rect bounds[4];
 } Tetrimino;
 #endif /* TETRIMINO_INTERNAL */
 
@@ -154,37 +151,11 @@ void tetrimino_set_block_type(Tetrimino *self, const int block_type)
 }
 
 /**
- * Sets the bounds of the Tetrimino based on the current rotation.
- */
-void set_bounds(Tetrimino *self)
-{
-    uint16_t mino_bits = tetrimino_rotations[self->block_type][self->current_rotation];
-    uint16_t bit = 0x1000;
-    int n_bounds = 0;
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            if (mino_bits & bit) {
-                SDL_Rect bound;
-                bound.x = self->x + 32 * j;
-                bound.y = self->y + 32 * i;
-                bound.w = 32;
-                bound.h = 32;
-                self->bounds[n_bounds] = bound;
-                ++n_bounds;
-            }
-            bit <<= j < 3 ? 1 : 0;
-        }
-        bit >>= 7;
-    }
-}
-
-/**
  * Sets the x position of the Tetrimino.
  */
 void tetrimino_set_x_pos(Tetrimino *self, const int x)
 {
     self->x = x;
-    set_bounds(self);
 }
 
 /**
@@ -193,33 +164,6 @@ void tetrimino_set_x_pos(Tetrimino *self, const int x)
 void tetrimino_set_y_pos(Tetrimino *self, const int y)
 {
     self->y = y;
-    set_bounds(self);
-}
-
-/**
- * Tests if the Tetrimino is colliding with an object.
- */
-int tetrimino_check_collision(const Tetrimino *self, const SDL_Rect object)
-{
-    const int object_left = object.x;
-    const int object_right = object.x + object.w;
-    const int object_top = object.y;
-    const int object_bottom = object.y + object.h;
-
-    for (int i = 0; i < 4; ++i) {
-        const int self_left = self->bounds[i].x;
-        const int self_right = self->bounds[i].x + self->bounds[i].w;
-        const int self_top = self->bounds[i].y;
-        const int self_bottom = self->bounds[i].y + self->bounds[i].h;
-
-        if (self_left >= object_right || self_right <= object_left || self_right <= object_left || self_bottom <= object_top) {
-            continue;
-        }
-
-        return 1;
-    }
-
-    return 0;
 }
 
 /**

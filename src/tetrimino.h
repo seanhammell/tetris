@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include <SDL2/SDL.h>
-
 #include "src/texture.h"
 
 #ifndef TETRIMINO_INTERNAL
@@ -22,8 +20,6 @@ int tetrimino_get_y_pos(const Tetrimino *self);
 void tetrimino_set_block_type(Tetrimino *self, const int block_type);
 void tetrimino_set_x_pos(Tetrimino *self, const int x);
 void tetrimino_set_y_pos(Tetrimino *self, const int y);
-
-int tetrimino_check_collision(const Tetrimino *self, const SDL_Rect object);
 
 void tetrimino_render(const Tetrimino *self, const Texture *blocks);
 

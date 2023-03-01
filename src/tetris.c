@@ -14,8 +14,7 @@ typedef struct tetris {
     int score;
     int level;
     int lines;
-    int matrix[20][10];
-    SDL_Rect matrix_bounds[3];
+    int matrix[19][10];
 
     Tetrimino *current;
     Tetrimino *next;
@@ -25,12 +24,6 @@ typedef struct tetris {
 #endif /* TETRIS_INTERNAL */
 
 #include "src/tetris.h"
-
-enum bounds {
-    GROUND,
-    LEFT_WALL,
-    RIGHT_WALL,
-};
 
 static int frames_per_step[30] = {
     48, 43, 38, 33, 28, 23, 18, 13, 8, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
@@ -43,17 +36,17 @@ Tetris *tetris_create(void)
 {
     Tetris *self = malloc(sizeof(Tetris));
     self->score = 0;
-    self->level = 0;
+    self->level = 10;
     self->lines = 0;
     for (int i = 0; i < 20; ++i) {
         for (int j = 0; j < 10; ++j) {
-            self->matrix[i][j] = 0;
+            if (i == 18) {
+                self->matrix[i][j] = 1;
+            } else {
+                self->matrix[i][j] = 0;
+            }
         }
     }
-    self->matrix_bounds[GROUND].x = 64;
-    self->matrix_bounds[GROUND].y = 576;
-    self->matrix_bounds[GROUND].w = 320;
-    self->matrix_bounds[GROUND].h = 0;
     self->current = tetrimino_create();
     self->next = tetrimino_create();
     return self;
@@ -173,7 +166,7 @@ void tetris_apply_gravity(Tetris *self)
         tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) + 32);
         state.frames_since_step = 0;
 
-        if (tetrimino_check_collision(self->current, self->matrix_bounds[GROUND]) || current_tetrimino_matrix_collision(self)) {
+        if (current_tetrimino_matrix_collision(self)) {
             tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) - 32);
             add_current_tetrimino_to_matrix(self);
             pull_from_random_bag(self);
@@ -192,7 +185,7 @@ void tetris_render(const Tetris *self, const Texture *blocks)
     tetrimino_render(self->current, blocks);
     tetrimino_render(self->next, blocks);
 
-    for (int i = 0; i < 20; ++i) {
+    for (int i = 0; i < 18; ++i) {
         for (int j = 0; j < 10; ++j) {
             if (self->matrix[i][j] == 0) {
                 continue;
