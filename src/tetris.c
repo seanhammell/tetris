@@ -38,7 +38,7 @@ Tetris *tetris_create(void)
     self->score = 0;
     self->level = 10;
     self->lines = 0;
-    for (int i = 0; i < 20; ++i) {
+    for (int i = 0; i < 19; ++i) {
         for (int j = 0; j < 10; ++j) {
             if (i == 18) {
                 self->matrix[i][j] = 1;
