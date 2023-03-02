@@ -40,7 +40,7 @@ int initialize(void)
         return 1;
     }
 
-    state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED);
+    state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (state.renderer == NULL) {
         fprintf(stderr, "Error creating renderer: %s\n", SDL_GetError());
         return 1;

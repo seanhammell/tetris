@@ -33,7 +33,7 @@ static int frames_per_step[30] = {
 };
 
 static int delayed_auto_shift[3] = {
-    0, 23, 9,
+    0, 8, 4,
 };
 
 /**
