@@ -43,7 +43,7 @@ Tetris *tetris_create(void)
 {
     Tetris *self = malloc(sizeof(Tetris));
     self->score = 0;
-    self->level = 5;
+    self->level = 0;
     self->lines = 0;
     for (int i = 0; i < 19; ++i) {
         for (int j = 0; j < 12; ++j) {
@@ -168,6 +168,35 @@ void add_current_tetrimino_to_matrix(Tetris *self)
 }
 
 /**
+ * Find and clear any full rows.
+ */
+void clear_lines(Tetris *self)
+{
+    int cleared_lines[4] = {0};
+    int line_index = 0;
+    for (int i = 0; i < 18; ++i) {
+        for (int j = 1; j < 11; ++j) {
+            if (self->matrix[i][j] == 0) {
+                break;
+            }
+
+            if (j == 10) {
+                cleared_lines[line_index] = i;
+                ++line_index;
+            }
+        }
+    }
+
+    for (int i = 0; i < line_index; ++i) {
+        for (int j = cleared_lines[i] - 1; j > 0; --j) {
+            for (int k = 1; k < 11; ++k) {
+                self->matrix[j + 1][k] = self->matrix[j][k];
+            }
+        }
+    }
+}
+
+/**
  * Apply gravity to the current Tetrimino based on the drop rate of the
  * current level and returns the number of frames to wait based on if the
  * Tetrimino was locked with additional frames for a line clear.
@@ -181,6 +210,7 @@ int tetris_apply_gravity(Tetris *self)
         if (current_tetrimino_matrix_collision(self)) {
             tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) - 32);
             add_current_tetrimino_to_matrix(self);
+            clear_lines(self);
             state.are_frames = 0;
             return 2;
         }
