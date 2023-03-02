@@ -54,8 +54,10 @@ Tetris *tetris_create(void)
             }
         }
     }
+
     self->current = tetrimino_create();
     self->next = tetrimino_create();
+
     self->gravity_status = self->level;
     self->das_status = 0;
     return self;
@@ -167,9 +169,10 @@ void add_current_tetrimino_to_matrix(Tetris *self)
 
 /**
  * Apply gravity to the current Tetrimino based on the drop rate of the
- * current level.
+ * current level and returns the number of frames to wait based on if the
+ * Tetrimino was locked with additional frames for a line clear.
  */
-void tetris_apply_gravity(Tetris *self)
+int tetris_apply_gravity(Tetris *self)
 {
     if (state.frames_since_step > frames_per_step[self->gravity_status]) {
         tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) + 32);
@@ -178,11 +181,23 @@ void tetris_apply_gravity(Tetris *self)
         if (current_tetrimino_matrix_collision(self)) {
             tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) - 32);
             add_current_tetrimino_to_matrix(self);
-            pull_from_random_bag(self);
-            tetrimino_set_x_pos(self->current, 160);
-            tetrimino_set_y_pos(self->current, 0);
+            state.are_frames = 0;
+            return 2;
         }
     }
+
+    return 0;
+}
+
+/**
+ * Get the next Tetrimino. This is not called in the apply gravity function to
+ * account for the ARE delay.
+ */
+void tetris_next_tetrimino(Tetris *self)
+{
+    pull_from_random_bag(self);
+    tetrimino_set_x_pos(self->current, 160);
+    tetrimino_set_y_pos(self->current, 0);
 }
 
 /**
@@ -202,26 +217,26 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
             self->gravity_status = 29;
             break;
         case SDLK_LEFT:
-            if (state.delayed_auto_shift_frames > delayed_auto_shift[self->das_status]) {
+            if (state.das_frames > delayed_auto_shift[self->das_status]) {
                 tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) - 32);
                 if (current_tetrimino_matrix_collision(self)) {
                     tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) + 32);
                     break;
                 }
-                state.delayed_auto_shift_frames = 0;
+                state.das_frames = 0;
                 if (self->das_status < 2) {
                     ++self->das_status;
                 }
             }
             break;
         case SDLK_RIGHT:
-            if (state.delayed_auto_shift_frames > delayed_auto_shift[self->das_status]) {
+            if (state.das_frames > delayed_auto_shift[self->das_status]) {
                 tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) + 32);
                 if (current_tetrimino_matrix_collision(self)) {
                     tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) - 32);
                     break;
                 }
-                state.delayed_auto_shift_frames = 0;
+                state.das_frames = 0;
                 if (self->das_status < 2) {
                     ++self->das_status;
                 }

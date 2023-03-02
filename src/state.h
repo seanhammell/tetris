@@ -6,8 +6,11 @@
 typedef struct state {
     SDL_Window *window;
     SDL_Renderer *renderer;
+
     int frames_since_step;
-    int delayed_auto_shift_frames;
+    int das_frames;
+    int are_status;
+    int are_frames;
 } State;
 
 extern State state;

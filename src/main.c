@@ -101,17 +101,21 @@ int main(int arg, char *argv[])
 
     SDL_Event event;
     state.frames_since_step = 0;
-    state.delayed_auto_shift_frames = 0;
+    state.das_frames = 0;
+    state.are_frames = 0;
+    int are_frame_delay = 0;
     for (;;) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                tetris_destroy(tetris);
-                goto terminate;
-            }
+        if (are_frame_delay == 0) {
+            while (SDL_PollEvent(&event)) {
+                if (event.type == SDL_QUIT) {
+                    tetris_destroy(tetris);
+                    goto terminate;
+                }
 
-            tetris_handle_event(tetris, event);
+                tetris_handle_event(tetris, event);
+            }
+            are_frame_delay = tetris_apply_gravity(tetris);
         }
-        tetris_apply_gravity(tetris);
 
         SDL_SetRenderDrawColor(state.renderer, R, G, B, A);
         SDL_RenderClear(state.renderer);
@@ -121,7 +125,13 @@ int main(int arg, char *argv[])
 
         SDL_RenderPresent(state.renderer);
         ++state.frames_since_step;
-        ++state.delayed_auto_shift_frames;
+        ++state.das_frames;
+        ++state.are_frames;
+
+        if (are_frame_delay && state.are_frames > are_frame_delay) {
+            tetris_next_tetrimino(tetris);
+            are_frame_delay = 0;
+        }
     }
 
 terminate:
