@@ -21,6 +21,7 @@ typedef struct tetris {
     int random_bag[7];
     int bag_index;
 
+    int gravity_status;
     int das_status;
 } Tetris;
 #endif /* TETRIS_INTERNAL */
@@ -55,6 +56,7 @@ Tetris *tetris_create(void)
     }
     self->current = tetrimino_create();
     self->next = tetrimino_create();
+    self->gravity_status = self->level;
     self->das_status = 0;
     return self;
 }
@@ -169,7 +171,7 @@ void add_current_tetrimino_to_matrix(Tetris *self)
  */
 void tetris_apply_gravity(Tetris *self)
 {
-    if (state.frames_since_step > frames_per_step[self->level]) {
+    if (state.frames_since_step > frames_per_step[self->gravity_status]) {
         tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) + 32);
         state.frames_since_step = 0;
 
@@ -195,6 +197,9 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
             if (current_tetrimino_matrix_collision(self)) {
                 tetrimino_unrotate(self->current);
             }
+            break;
+        case SDLK_DOWN:
+            self->gravity_status = 29;
             break;
         case SDLK_LEFT:
             if (state.delayed_auto_shift_frames > delayed_auto_shift[self->das_status]) {
@@ -224,6 +229,7 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
             break;
         }
     } else if (event.type == SDL_KEYUP) {
+        self->gravity_status = self->level;
         self->das_status = 0;
     }
 }
