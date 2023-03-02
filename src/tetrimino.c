@@ -160,6 +160,15 @@ void tetrimino_rotate(Tetrimino *self)
 }
 
 /**
+ * Decremments the current rotation of the Tetrimino.
+ */
+void tetrimino_unrotate(Tetrimino *self)
+{
+    self->current_rotation += 3;
+    self->current_rotation &= 3;
+}
+
+/**
  * Sets the x position of the Tetrimino.
  */
 void tetrimino_set_x_pos(Tetrimino *self, const int x)

@@ -14,7 +14,7 @@ typedef struct tetris {
     int score;
     int level;
     int lines;
-    int matrix[19][10];
+    int matrix[19][12];
 
     Tetrimino *current;
     Tetrimino *next;
@@ -42,11 +42,11 @@ Tetris *tetris_create(void)
 {
     Tetris *self = malloc(sizeof(Tetris));
     self->score = 0;
-    self->level = 0;
+    self->level = 5;
     self->lines = 0;
     for (int i = 0; i < 19; ++i) {
-        for (int j = 0; j < 10; ++j) {
-            if (i == 18) {
+        for (int j = 0; j < 12; ++j) {
+            if (i == 18 || j == 0 || j == 11) {
                 self->matrix[i][j] = 1;
             } else {
                 self->matrix[i][j] = 0;
@@ -130,7 +130,7 @@ int current_tetrimino_matrix_collision(Tetris *self)
         for (int j = 0; j < 4; ++j) {
             if (mino_bits & bit) {
                 int row = i + tetrimino_get_y_pos(self->current) / 32;
-                int col = j + (tetrimino_get_x_pos(self->current) - 64) / 32;
+                int col = j + (tetrimino_get_x_pos(self->current) - 32) / 32;
                 if (self->matrix[row][col] != 0) {
                     return 1;
                 }
@@ -154,7 +154,7 @@ void add_current_tetrimino_to_matrix(Tetris *self)
         for (int j = 0; j < 4; ++j) {
             if (mino_bits & bit) {
                 int row = i + tetrimino_get_y_pos(self->current) / 32;
-                int col = j + (tetrimino_get_x_pos(self->current) - 64) / 32;
+                int col = j + (tetrimino_get_x_pos(self->current) - 32) / 32;
                 self->matrix[row][col] = tetrimino_get_block_type(self->current);
             }
             bit <<= j < 3 ? 1 : 0;
@@ -192,10 +192,17 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
         switch (event.key.keysym.sym) {
         case SDLK_UP:
             tetrimino_rotate(self->current);
+            if (current_tetrimino_matrix_collision(self)) {
+                tetrimino_unrotate(self->current);
+            }
             break;
         case SDLK_LEFT:
             if (state.delayed_auto_shift_frames > delayed_auto_shift[self->das_status]) {
                 tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) - 32);
+                if (current_tetrimino_matrix_collision(self)) {
+                    tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) + 32);
+                    break;
+                }
                 state.delayed_auto_shift_frames = 0;
                 if (self->das_status < 2) {
                     ++self->das_status;
@@ -205,6 +212,10 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
         case SDLK_RIGHT:
             if (state.delayed_auto_shift_frames > delayed_auto_shift[self->das_status]) {
                 tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) + 32);
+                if (current_tetrimino_matrix_collision(self)) {
+                    tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) - 32);
+                    break;
+                }
                 state.delayed_auto_shift_frames = 0;
                 if (self->das_status < 2) {
                     ++self->das_status;
@@ -227,11 +238,11 @@ void tetris_render(const Tetris *self, const Texture *blocks)
     tetrimino_render(self->next, blocks);
 
     for (int i = 0; i < 18; ++i) {
-        for (int j = 0; j < 10; ++j) {
+        for (int j = 1; j < 11; ++j) {
             if (self->matrix[i][j] == 0) {
                 continue;
             }
-            texture_render(blocks, self->matrix[i][j], 64 + 32 * j, 32 * i);
+            texture_render(blocks, self->matrix[i][j], 32 + 32 * j, 32 * i);
         }
     }
 }
