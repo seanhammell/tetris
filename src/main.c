@@ -121,7 +121,7 @@ int main(int arg, char *argv[])
         SDL_RenderClear(state.renderer);
 
         texture_render(background, 0, 0, 0);
-        tetris_render(tetris, blocks);
+        tetris_render(tetris, blocks, are_frame_delay);
 
         SDL_RenderPresent(state.renderer);
         ++state.frames_since_step;

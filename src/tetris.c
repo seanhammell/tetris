@@ -168,9 +168,9 @@ void add_current_tetrimino_to_matrix(Tetris *self)
 }
 
 /**
- * Find and clear any full rows.
+ * Clears full rows, returning if any rows were cleared.
  */
-void clear_lines(Tetris *self)
+int clear_lines(Tetris *self)
 {
     int cleared_lines[4] = {0};
     int line_index = 0;
@@ -194,6 +194,8 @@ void clear_lines(Tetris *self)
             }
         }
     }
+
+    return line_index > 0;
 }
 
 /**
@@ -210,8 +212,10 @@ int tetris_apply_gravity(Tetris *self)
         if (current_tetrimino_matrix_collision(self)) {
             tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) - 32);
             add_current_tetrimino_to_matrix(self);
-            clear_lines(self);
             state.are_frames = 0;
+            if (clear_lines(self)) {
+                return 93;
+            }
             return 2;
         }
     }
@@ -228,6 +232,7 @@ void tetris_next_tetrimino(Tetris *self)
     pull_from_random_bag(self);
     tetrimino_set_x_pos(self->current, 160);
     tetrimino_set_y_pos(self->current, 0);
+    tetrimino_reset_rotation(self->current);
 }
 
 /**
@@ -283,9 +288,11 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
  * Renders the current Tetrimino, next Tetrimino, and playfield matrix to the
  * screen.
  */
-void tetris_render(const Tetris *self, const Texture *blocks)
+void tetris_render(const Tetris *self, const Texture *blocks, const int are_status)
 {
-    tetrimino_render(self->current, blocks);
+    if (are_status == 0) {
+        tetrimino_render(self->current, blocks);
+    }
     tetrimino_render(self->next, blocks);
 
     for (int i = 0; i < 18; ++i) {

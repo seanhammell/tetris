@@ -15,6 +15,6 @@ int tetris_apply_gravity(Tetris *self);
 void tetris_next_tetrimino(Tetris *self);
 void tetris_handle_event(Tetris *self, const SDL_Event event);
 
-void tetris_render(const Tetris *self, const Texture *blocks);
+void tetris_render(const Tetris *self, const Texture *blocks, const int are_status);
 
 #endif /* TETRIS_H */

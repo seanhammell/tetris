@@ -151,6 +151,22 @@ void tetrimino_set_block_type(Tetrimino *self, const int block_type)
 }
 
 /**
+ * Sets the x position of the Tetrimino.
+ */
+void tetrimino_set_x_pos(Tetrimino *self, const int x)
+{
+    self->x = x;
+}
+
+/**
+ * Sets the y position of the Tetrimino.
+ */
+void tetrimino_set_y_pos(Tetrimino *self, const int y)
+{
+    self->y = y;
+}
+
+/**
  * Increments the current rotation of the Tetrimino.
  */
 void tetrimino_rotate(Tetrimino *self)
@@ -169,19 +185,11 @@ void tetrimino_unrotate(Tetrimino *self)
 }
 
 /**
- * Sets the x position of the Tetrimino.
+ * Reset the current rotation of the Tetrimino to 0.
  */
-void tetrimino_set_x_pos(Tetrimino *self, const int x)
+void tetrimino_reset_rotation(Tetrimino *self)
 {
-    self->x = x;
-}
-
-/**
- * Sets the y position of the Tetrimino.
- */
-void tetrimino_set_y_pos(Tetrimino *self, const int y)
-{
-    self->y = y;
+    self->current_rotation = 0;
 }
 
 /**
