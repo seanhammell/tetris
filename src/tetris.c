@@ -58,7 +58,7 @@ Tetris *tetris_create(void)
     self->current = tetrimino_create();
     self->next = tetrimino_create();
 
-    self->gravity_status = 10;
+    self->gravity_status = self->level;
     self->das_status = 0;
     return self;
 }
@@ -167,6 +167,7 @@ void add_current_tetrimino_to_matrix(Tetris *self)
     }
 }
 
+#include <stdio.h>
 /**
  * Checks if there are any lines to clear, adding full rows to the cleared
  * lines array.
@@ -187,6 +188,9 @@ int has_lines_to_clear(Tetris *self, int *cleared_lines)
         }
     }
 
+    self->lines += line_index;
+    self->level = self->lines / 10;
+    printf("lines: %d, level: %d\n", self->lines, self->level);
     return line_index > 0;
 }
 
@@ -195,7 +199,12 @@ int has_lines_to_clear(Tetris *self, int *cleared_lines)
  */
 void tetris_clear_lines(Tetris *self, int *cleared_lines)
 {
-    for (int i = 0; i < cleared_lines[i]; ++i) {
+    int line_index = 0;
+    for (int i = 0; i < 4 && cleared_lines[i] != 0; ++i) {
+        ++line_index;
+    }
+
+    for (int i = 0; i < line_index; ++i) {
         for (int j = cleared_lines[i] - 1; j > 0; --j) {
             for (int k = 1; k < 11; ++k) {
                 self->matrix[j + 1][k] = self->matrix[j][k];
@@ -219,6 +228,7 @@ int tetris_apply_gravity(Tetris *self, int *cleared_lines)
             tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) - 32);
             add_current_tetrimino_to_matrix(self);
             state.are_frames = 0;
+            printf("fall rate: %d, ", frames_per_step[self->gravity_status]);
             if (has_lines_to_clear(self, cleared_lines)) {
                 return 93;
             }
@@ -255,7 +265,7 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
             }
             break;
         case SDLK_DOWN:
-            self->gravity_status = 29;
+            self->gravity_status = 20;
             break;
         case SDLK_LEFT:
             if (state.das_frames > delayed_auto_shift[self->das_status]) {
@@ -285,7 +295,7 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
             break;
         }
     } else if (event.type == SDL_KEYUP) {
-        self->gravity_status = 10;
+        self->gravity_status = self->level;
         self->das_status = 0;
     }
 }
