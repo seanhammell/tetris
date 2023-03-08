@@ -104,6 +104,7 @@ int main(int arg, char *argv[])
     state.das_frames = 0;
     state.are_frames = 0;
     int are_frame_delay = 0;
+    int cleared_lines[4] = {0};
     for (;;) {
         if (are_frame_delay == 0) {
             while (SDL_PollEvent(&event)) {
@@ -114,7 +115,7 @@ int main(int arg, char *argv[])
 
                 tetris_handle_event(tetris, event);
             }
-            are_frame_delay = tetris_apply_gravity(tetris);
+            are_frame_delay = tetris_apply_gravity(tetris, cleared_lines);
         }
 
         SDL_SetRenderDrawColor(state.renderer, R, G, B, A);
@@ -122,6 +123,13 @@ int main(int arg, char *argv[])
 
         texture_render(background, 0, 0, 0);
         tetris_render(tetris, blocks, are_frame_delay);
+        if (are_frame_delay == 93 && (state.are_frames / 12) % 2) {
+            for (int i = 0; cleared_lines[i] != 0; ++i) {
+                SDL_Rect flash = {64, 32 * cleared_lines[i], 320, 32};
+                SDL_SetRenderDrawColor(state.renderer, 76, 86, 106, A);
+                SDL_RenderFillRect(state.renderer, &flash);
+            }
+        }
 
         SDL_RenderPresent(state.renderer);
         ++state.frames_since_step;
@@ -129,8 +137,12 @@ int main(int arg, char *argv[])
         ++state.are_frames;
 
         if (are_frame_delay && state.are_frames > are_frame_delay) {
+            tetris_clear_lines(tetris, cleared_lines);
             tetris_next_tetrimino(tetris);
             are_frame_delay = 0;
+            for (int i = 0; i < 4; ++i) {
+                cleared_lines[i] = 0;
+            }
         }
     }
 

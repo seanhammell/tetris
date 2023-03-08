@@ -28,12 +28,12 @@ typedef struct tetris {
 
 #include "src/tetris.h"
 
-static int frames_per_step[30] = {
-    48, 43, 38, 33, 28, 23, 18, 13, 8, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+static int frames_per_step[21] = {
+    53, 49, 45, 41, 37, 33, 28, 22, 17, 11, 10, 9, 8, 7, 6, 6, 5, 5, 4, 4, 3,
 };
 
 static int delayed_auto_shift[3] = {
-    0, 8, 4,
+    0, 23, 9,
 };
 
 /**
@@ -58,7 +58,7 @@ Tetris *tetris_create(void)
     self->current = tetrimino_create();
     self->next = tetrimino_create();
 
-    self->gravity_status = self->level;
+    self->gravity_status = 10;
     self->das_status = 0;
     return self;
 }
@@ -168,11 +168,11 @@ void add_current_tetrimino_to_matrix(Tetris *self)
 }
 
 /**
- * Clears full rows, returning if any rows were cleared.
+ * Checks if there are any lines to clear, adding full rows to the cleared
+ * lines array.
  */
-int clear_lines(Tetris *self)
+int has_lines_to_clear(Tetris *self, int *cleared_lines)
 {
-    int cleared_lines[4] = {0};
     int line_index = 0;
     for (int i = 0; i < 18; ++i) {
         for (int j = 1; j < 11; ++j) {
@@ -187,15 +187,21 @@ int clear_lines(Tetris *self)
         }
     }
 
-    for (int i = 0; i < line_index; ++i) {
+    return line_index > 0;
+}
+
+/**
+ * Removes any full rows from the matrix.
+ */
+void tetris_clear_lines(Tetris *self, int *cleared_lines)
+{
+    for (int i = 0; i < cleared_lines[i]; ++i) {
         for (int j = cleared_lines[i] - 1; j > 0; --j) {
             for (int k = 1; k < 11; ++k) {
                 self->matrix[j + 1][k] = self->matrix[j][k];
             }
         }
     }
-
-    return line_index > 0;
 }
 
 /**
@@ -203,7 +209,7 @@ int clear_lines(Tetris *self)
  * current level and returns the number of frames to wait based on if the
  * Tetrimino was locked with additional frames for a line clear.
  */
-int tetris_apply_gravity(Tetris *self)
+int tetris_apply_gravity(Tetris *self, int *cleared_lines)
 {
     if (state.frames_since_step > frames_per_step[self->gravity_status]) {
         tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) + 32);
@@ -213,7 +219,7 @@ int tetris_apply_gravity(Tetris *self)
             tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) - 32);
             add_current_tetrimino_to_matrix(self);
             state.are_frames = 0;
-            if (clear_lines(self)) {
+            if (has_lines_to_clear(self, cleared_lines)) {
                 return 93;
             }
             return 2;
@@ -279,7 +285,7 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
             break;
         }
     } else if (event.type == SDL_KEYUP) {
-        self->gravity_status = self->level;
+        self->gravity_status = 10;
         self->das_status = 0;
     }
 }
