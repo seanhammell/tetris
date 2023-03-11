@@ -130,7 +130,8 @@ int main(int arg, char *argv[])
         SDL_RenderClear(state.renderer);
 
         texture_render(background, 0, 0, 0);
-        tetris_render(tetris, blocks, are_frame_delay);
+        tetris_render(tetris, blocks, numbers, are_frame_delay);
+
         if (are_frame_delay == 93 && (state.are_frames / 12) % 2) {
             for (int i = 0; cleared_lines[i] != 0; ++i) {
                 SDL_Rect flash = {64, 32 * cleared_lines[i], 320, 32};

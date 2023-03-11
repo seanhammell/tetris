@@ -109,9 +109,7 @@ void texture_destroy(Texture *self)
 void texture_render(const Texture *self, const int clip, const int x, const int y)
 {
     SDL_Rect dest = { x, y, self->width, self->height };
-    if (clip != 0) {
-        dest.w = self->clips[clip].w;
-        dest.h = self->clips[clip].h;
-    }
+    dest.w = self->clips[clip].w;
+    dest.h = self->clips[clip].h;
     SDL_RenderCopy(state.renderer, self->texture, &self->clips[clip], &dest);
 }

@@ -304,7 +304,7 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
  * Renders the current Tetrimino, next Tetrimino, and playfield matrix to the
  * screen.
  */
-void tetris_render(const Tetris *self, const Texture *blocks, const int are_status)
+void tetris_render(const Tetris *self, const Texture *blocks, const Texture *numbers, const int are_status)
 {
     if (are_status == 0) {
         tetrimino_render(self->current, blocks);
@@ -318,5 +318,15 @@ void tetris_render(const Tetris *self, const Texture *blocks, const int are_stat
             }
             texture_render(blocks, self->matrix[i][j], 32 + 32 * j, 32 * i);
         }
+    }
+
+    if (self->score == 0) {
+        texture_render(numbers, 0, 576, 96);
+        return;
+    }
+
+    int score = self->score;
+    for (int i = 0; score; ++i, score /= 10) {
+        texture_render(numbers, score % 10, 576 - 32 * i, 96);
     }
 }
