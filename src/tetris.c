@@ -190,7 +190,6 @@ int has_lines_to_clear(Tetris *self, int *cleared_lines)
 
     self->lines += line_index;
     self->level = self->lines / 10;
-    printf("lines: %d, level: %d\n", self->lines, self->level);
     return line_index > 0;
 }
 
@@ -211,6 +210,8 @@ void tetris_clear_lines(Tetris *self, int *cleared_lines)
             }
         }
     }
+
+    self->score += 10 * (self->level * 10 + line_index);
 }
 
 /**
@@ -228,7 +229,6 @@ int tetris_apply_gravity(Tetris *self, int *cleared_lines)
             tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) - 32);
             add_current_tetrimino_to_matrix(self);
             state.are_frames = 0;
-            printf("fall rate: %d, ", frames_per_step[self->gravity_status]);
             if (has_lines_to_clear(self, cleared_lines)) {
                 return 93;
             }

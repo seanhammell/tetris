@@ -19,6 +19,7 @@ State state;
 
 static Texture *background;
 static Texture *blocks;
+static Texture *numbers;
 
 /**
  * Initializes SDL and the global state.
@@ -77,6 +78,7 @@ int main(int arg, char *argv[])
 {
     background = texture_create();
     blocks = texture_create();
+    numbers = texture_create();
 
     if (initialize() != 0) {
         fprintf(stderr, "Failed to initialize\n");
@@ -93,8 +95,14 @@ int main(int arg, char *argv[])
         goto terminate;
     }
 
+    if (texture_initialize(numbers, "./img/numbers.png") != 0) {
+        fprintf(stderr, "Failed to initialize numbers texture\n");
+        goto terminate;
+    }
+
     texture_set_clips(background, 1, 1, SCREEN_WIDTH, SCREEN_HEIGHT);
     texture_set_clips(blocks, 2, 4, 32, 32);
+    texture_set_clips(numbers, 2, 5, 32, 32);
 
     Tetris *tetris = tetris_create();
     tetris_initialize(tetris);
