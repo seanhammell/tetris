@@ -167,11 +167,11 @@ void add_current_tetrimino_to_matrix(Tetris *self)
     }
 }
 
-#include <stdio.h>
 /**
  * Checks if there are any lines to clear, adding full rows to the cleared
  * lines array.
  */
+const int score_table[5] = {0, 40, 100, 300, 1200};
 int has_lines_to_clear(Tetris *self, int *cleared_lines)
 {
     int line_index = 0;
@@ -188,6 +188,7 @@ int has_lines_to_clear(Tetris *self, int *cleared_lines)
         }
     }
 
+    self->score += score_table[line_index] * (self->level + 1);
     self->lines += line_index;
     self->level = self->lines / 10;
     return line_index > 0;
@@ -210,8 +211,6 @@ void tetris_clear_lines(Tetris *self, int *cleared_lines)
             }
         }
     }
-
-    self->score += 10 * (self->level * 10 + line_index);
 }
 
 /**
