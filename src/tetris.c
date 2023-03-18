@@ -126,7 +126,7 @@ void tetris_destroy(Tetris *self)
 /**
  * Tests whether the current Tetrimino is colliding with blocks in the matrix.
  */
-int current_tetrimino_matrix_collision(Tetris *self)
+int tetris_current_tetrimino_matrix_collision(Tetris *self)
 {
     uint16_t mino_bits = tetrimino_get_rotation(self->current);
     uint16_t bit = 0x1000;
@@ -224,7 +224,7 @@ int tetris_apply_gravity(Tetris *self, int *cleared_lines)
         tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) + 32);
         state.frames_since_step = 0;
 
-        if (current_tetrimino_matrix_collision(self)) {
+        if (tetris_current_tetrimino_matrix_collision(self)) {
             tetrimino_set_y_pos(self->current, tetrimino_get_y_pos(self->current) - 32);
             add_current_tetrimino_to_matrix(self);
             state.are_frames = 0;
@@ -259,7 +259,7 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
         switch (event.key.keysym.sym) {
         case SDLK_UP:
             tetrimino_rotate(self->current);
-            if (current_tetrimino_matrix_collision(self)) {
+            if (tetris_current_tetrimino_matrix_collision(self)) {
                 tetrimino_unrotate(self->current);
             }
             break;
@@ -269,7 +269,7 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
         case SDLK_LEFT:
             if (state.das_frames > delayed_auto_shift[self->das_status]) {
                 tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) - 32);
-                if (current_tetrimino_matrix_collision(self)) {
+                if (tetris_current_tetrimino_matrix_collision(self)) {
                     tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) + 32);
                     break;
                 }
@@ -282,7 +282,7 @@ void tetris_handle_event(Tetris *self, const SDL_Event event)
         case SDLK_RIGHT:
             if (state.das_frames > delayed_auto_shift[self->das_status]) {
                 tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) + 32);
-                if (current_tetrimino_matrix_collision(self)) {
+                if (tetris_current_tetrimino_matrix_collision(self)) {
                     tetrimino_set_x_pos(self->current, tetrimino_get_x_pos(self->current) - 32);
                     break;
                 }

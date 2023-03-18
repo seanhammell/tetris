@@ -148,6 +148,9 @@ int main(int arg, char *argv[])
         if (are_frame_delay && state.are_frames > are_frame_delay) {
             tetris_clear_lines(tetris, cleared_lines);
             tetris_next_tetrimino(tetris);
+            if (tetris_current_tetrimino_matrix_collision(tetris)) {
+                goto terminate;
+            }
             are_frame_delay = 0;
             for (int i = 0; i < 4; ++i) {
                 cleared_lines[i] = 0;

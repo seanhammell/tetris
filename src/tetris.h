@@ -11,6 +11,7 @@ Tetris *tetris_create(void);
 void tetris_initialize(Tetris *self);
 void tetris_destroy(Tetris *self);
 
+int tetris_current_tetrimino_matrix_collision(Tetris *self);
 int tetris_apply_gravity(Tetris *self, int *cleared_lines);
 void tetris_clear_lines(Tetris *self, int *cleared_lines);
 void tetris_next_tetrimino(Tetris *self);
